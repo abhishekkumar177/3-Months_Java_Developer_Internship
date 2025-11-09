@@ -6,12 +6,12 @@ public class Que2{
   public static void main(String[] args) {
     Scanner scanner = new Scanner(System.in);
     System.out.print("Enter the Number: ");
-    int number = nextInt();
-    if (number % 2 = 0) {
-      System.out.print("The" +number+ "is an Even.");
+    int number = scanner.nextInt();
+    if (number % 2 == 0) {
+      System.out.print("The " + number + " is Even.");
     }
     else {
-      System.out.print("The" +number+ "is Odd");
+      System.out.print("The " + number + " is Odd.");
     }
     scanner.close();
   }
