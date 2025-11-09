@@ -6,12 +6,12 @@ public class Que3{
   public static void main(String[] args) {
     Scanner scanner = new Scanner(System.in);
     System.out.print("Enter the Number: ");
-    int number = Scanner.nextINT();
+    int number = scanner.nextInt();
     if (number % 5 ==0) {
-      System.out.print("The number" + number + "is divisible by 5.");
+      System.out.print("The number " + number + " is divisible by 5.");
     }
     else {
-      System.out.print("The number" + number + "is not divisible by 5.");
+      System.out.print("The number " + number + " is not divisible by 5.");
     }
     scanner.close();
   }
