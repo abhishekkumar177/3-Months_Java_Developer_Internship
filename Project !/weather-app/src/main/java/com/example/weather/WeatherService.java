@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import java.util.Map;
+import java.util.HashMap; // Import HashMap
 
 @Service
 public class WeatherService {
@@ -18,15 +19,25 @@ public class WeatherService {
     }
 
     public Map<String, Object> getWeather(double lat, double lon) {
-        // Build the URL: ?latitude=...&longitude=...&current_weather=true
+        // Build the URL
         String url = UriComponentsBuilder.fromHttpUrl(API_URL)
                 .queryParam("latitude", lat)
                 .queryParam("longitude", lon)
                 .queryParam("current_weather", "true")
                 .toUriString();
 
-        // Fetch data and parse directly into a Map for simplicity
-        // In a production app, use a dedicated DTO class instead of Map
-        return restTemplate.getForObject(url, Map.class);
+        try {
+            // Try to fetch the data
+            return restTemplate.getForObject(url, Map.class);
+        } catch (Exception e) {
+            // If it fails, print the error to the console
+            e.printStackTrace();
+            
+            // AND return the error to the browser so we can see it
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Failed to fetch weather data");
+            errorResponse.put("message", e.getMessage());
+            return errorResponse;
+        }
     }
 }

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background-color: #f0f2f5; margin-top: 50px; }
+        .container { background: white; max-width: 400px; margin: auto; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1 { color: #333; }
+        input { padding: 10px; width: 80%; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+        button { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #0056b3; }
+        #result { margin-top: 20px; font-size: 1.2em; font-weight: bold; color: #444; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🌤️ Weather Check</h1>
+        <p>Enter coordinates to check the weather</p>
+        
+        <input type="text" id="lat" placeholder="Latitude (e.g. 28.61)" value="28.61">
+        <input type="text" id="lon" placeholder="Longitude (e.g. 77.20)" value="77.20">
+        <br>
+        <button onclick="getWeather()">Get Weather</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function getWeather() {
+            const lat = document.getElementById('lat').value;
+            const lon = document.getElementById('lon').value;
+            const resultDiv = document.getElementById('result');
+
+            resultDiv.innerHTML = "Loading...";
+
+            // Call YOUR Java Backend API
+            fetch(`/weather?lat=${lat}&lon=${lon}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Extract data from the JSON you saw earlier
+                    const temp = data.current_weather.temperature;
+                    const wind = data.current_weather.windspeed;
+                    resultDiv.innerHTML = `🌡️ Temperature: ${temp}°C <br> 💨 Wind Speed: ${wind} km/h`;
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = "Error fetching data!";
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+
+</body>
+</html>
