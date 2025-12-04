@@ -1,5 +1,7 @@
 #  Java Spring Boot Weather App
 
+<img width="726" height="660" alt="image" src="https://github.com/user-attachments/assets/4854d0e6-51af-4256-b332-532466ce8f08" />
+
 A full-stack weather application built with **Java Spring Boot** and **Vanilla JavaScript**. This application allows users to check real-time weather conditions (Temperature and Wind Speed) for any location using Latitude and Longitude coordinates.
 
 It acts as a bridge between the user and the **Open-Meteo API**, fetching data securely on the backend and serving it to a clean HTML frontend.
