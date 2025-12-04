@@ -17,16 +17,11 @@ public class WeatherController {
     // Endpoint: http://localhost:8080/weather?lat=52.52&lon=13.41
     @GetMapping("/weather")
     public Map<String, Object> getWeather(
-            // FIX: Added 'name = "lat"' so Spring knows exactly what to look for
             @RequestParam(name = "lat", defaultValue = "52.52") double lat, 
             @RequestParam(name = "lon", defaultValue = "13.41") double lon) {
         
         return weatherService.getWeather(lat, lon);
     }
     
-    // Simple Health Check
-    @GetMapping("/")
-    public String home() {
-        return "Weather App is running! Go to <a href='/weather'>/weather</a> to see data.";
-    }
+    // DELETED: The 'home' method is gone, so index.html will load instead!
 }

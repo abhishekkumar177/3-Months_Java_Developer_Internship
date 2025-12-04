@@ -8,7 +8,7 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 public class WeatherApplication {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) { // Fixed: Removed the random '5'
         SpringApplication.run(WeatherApplication.class, args);
     }
 
