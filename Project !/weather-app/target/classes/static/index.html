@@ -5,48 +5,209 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather App</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; text-align: center; background-color: #f0f2f5; margin-top: 50px; }
-        .container { background: white; max-width: 400px; margin: auto; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h1 { color: #333; }
-        input { padding: 10px; width: 80%; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
-        button { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            text-align: center; 
+            background-color: #f0f2f5; 
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .container { 
+            background: white; 
+            max-width: 600px; 
+            width: 100%;
+            height: fit-content;
+            padding: 30px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+        }
+        h1 { color: #333; margin-bottom: 20px; }
+        h2 { margin-top: 0; color: #444; }
+        h3 { color: #555; margin-top: 20px; margin-bottom: 15px; }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        input { 
+            padding: 12px; 
+            width: 120px; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            text-align: center;
+        }
+        
+        button { 
+            padding: 12px 25px; 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            transition: background 0.3s;
+        }
         button:hover { background-color: #0056b3; }
-        #result { margin-top: 20px; font-size: 1.2em; font-weight: bold; color: #444; }
+        
+        #result { 
+            margin-top: 20px; 
+            text-align: left;
+        }
+
+        /* Current Weather Styles */
+        .current-weather {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .current-weather p {
+            font-size: 1.1em;
+            margin: 10px 0;
+        }
+
+        /* Forecast Container Styles */
+        #forecast-container {
+            display: flex; 
+            gap: 10px; 
+            justify-content: center;
+            flex-wrap: wrap; /* Allows cards to wrap on small screens */
+        }
+
+        .forecast-card {
+            border: 1px solid #ddd; 
+            padding: 10px; 
+            border-radius: 8px; 
+            background: #f9f9f9;
+            flex: 1;
+            min-width: 80px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .forecast-date {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        hr {
+            border: 0;
+            border-top: 1px solid #eee;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h1>🌤️ Weather Check</h1>
-        <p>Enter coordinates to check the weather</p>
+        <p style="color: #666; margin-bottom: 20px;">Enter coordinates to check the forecast</p>
         
-        <input type="text" id="lat" placeholder="Latitude (e.g. 28.61)" value="28.61">
-        <input type="text" id="lon" placeholder="Longitude (e.g. 77.20)" value="77.20">
-        <br>
-        <button onclick="getWeather()">Get Weather</button>
+        <div class="input-group">
+            <input type="text" id="lat" placeholder="Lat" value="28.61">
+            <input type="text" id="lon" placeholder="Lon" value="77.20">
+            <button onclick="getWeather()">Get Weather</button>
+        </div>
 
         <div id="result"></div>
     </div>
 
     <script>
+        function getWeatherIcon(code) {
+            if (code === 0) return "☀️";
+            if (code >= 1 && code <= 3) return "⛅";
+            if (code >= 45 && code <= 48) return "🌫️";
+            if (code >= 51 && code <= 67) return "🌧️";
+            if (code >= 71 && code <= 77) return "🌨️";
+            if (code >= 80 && code <= 82) return "🌦️";
+            if (code >= 95) return "⛈️";
+            return "🌡️"; // Default
+        }
+
         function getWeather() {
             const lat = document.getElementById('lat').value;
             const lon = document.getElementById('lon').value;
             const resultDiv = document.getElementById('result');
 
-            resultDiv.innerHTML = "Loading...";
+            if(!lat || !lon) {
+                alert("Please enter both latitude and longitude");
+                return;
+            }
 
-            // Call YOUR Java Backend API
-            fetch(`/weather?lat=${lat}&lon=${lon}`)
-                .then(response => response.json())
+            resultDiv.innerHTML = '<p style="text-align:center;">Loading weather data...</p>';
+
+            // Constructing the URL for Open-Meteo API based on your requested fields
+            const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`;
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    // Extract data from the JSON you saw earlier
-                    const temp = data.current_weather.temperature;
-                    const wind = data.current_weather.windspeed;
-                    resultDiv.innerHTML = `🌡️ Temperature: ${temp}°C <br> 💨 Wind Speed: ${wind} km/h`;
+                    // --- New Logic Implementation ---
+
+                    // 1. Current Weather
+                    const current = data.current; 
+                    const temp = current.temperature_2m;
+                    const humidity = current.relative_humidity_2m;
+                    const wind = current.wind_speed_10m;
+                    const currentIcon = getWeatherIcon(current.weather_code);
+
+                    resultDiv.innerHTML = `
+                        <div class="current-weather">
+                            <h2>${currentIcon} Current Weather</h2>
+                            <p>🌡️ Temperature: <strong>${temp}°C</strong></p>
+                            <p>💧 Humidity: <strong>${humidity}%</strong></p>
+                            <p>💨 Wind Speed: <strong>${wind} km/h</strong></p>
+                        </div>
+                        <hr>
+                        <h3 style="text-align:center;">5-Day Forecast</h3>
+                        <div id="forecast-container"></div>
+                    `;
+
+                    // 2. Daily Forecast
+                    const daily = data.daily;
+                    const forecastContainer = document.getElementById('forecast-container');
+                    let forecastHTML = '';
+
+                    // Loop through the first 5 days
+                    // Note: Open-Meteo usually returns 7 days, so we limit to 5
+                    const daysToDisplay = Math.min(daily.time.length, 5);
+
+                    for(let i = 0; i < daysToDisplay; i++) {
+                        const dayIcon = getWeatherIcon(daily.weather_code[i]);
+                        
+                        // formatting the date slightly for better readability
+                        const dateObj = new Date(daily.time[i]);
+                        const dateStr = dateObj.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+
+                        forecastHTML += `
+                            <div class="forecast-card">
+                                <strong class="forecast-date">${dateStr}</strong>
+                                <div style="font-size: 1.5em; margin: 5px 0;">${dayIcon}</div>
+                                <span style="color: #d32f2f;">🔺 ${daily.temperature_2m_max[i]}°C</span><br>
+                                <span style="color: #1976d2;">🔻 ${daily.temperature_2m_min[i]}°C</span>
+                            </div>
+                        `;
+                    }
+                    
+                    forecastContainer.innerHTML = forecastHTML;
                 })
                 .catch(error => {
-                    resultDiv.innerHTML = "Error fetching data!";
+                    resultDiv.innerHTML = `<p style="color:red; text-align:center;">Error fetching data! <br> <small>${error.message}</small></p>`;
                     console.error('Error:', error);
                 });
         }
